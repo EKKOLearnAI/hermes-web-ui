@@ -109,9 +109,10 @@ function showWindowWithFade(focus = true) {
   if (mainWindow.isMinimized()) mainWindow.restore()
 
   cancelWindowFade()
+  const showWindow = focus ? () => mainWindow.show() : () => mainWindow.showInactive()
   if (process.platform !== 'win32' || mainWindow.isVisible()) {
     mainWindow.setOpacity(1)
-    mainWindow.show()
+    showWindow()
     if (focus) mainWindow.focus()
     return
   }
@@ -119,7 +120,7 @@ function showWindowWithFade(focus = true) {
   const durationMs = 180
   const startedAt = Date.now()
   mainWindow.setOpacity(0)
-  mainWindow.show()
+  showWindow()
   if (focus) mainWindow.focus()
   windowFadeTimer = setInterval(() => {
     if (!mainWindow || mainWindow.isDestroyed()) {
@@ -511,7 +512,7 @@ async function createWindow(): Promise<void> {
   })
 
   mainWindow.once('ready-to-show', () => {
-    if (!START_HIDDEN) showWindowWithFade(true)
+    if (!START_HIDDEN) showWindowWithFade(false)
   })
 
   mainWindow.webContents.on('render-process-gone', (_event, details) => {
